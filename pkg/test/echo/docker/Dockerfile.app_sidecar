@@ -1,0 +1,18 @@
+ARG BASE_VERSION=latest
+
+FROM docker.io/istio/base:${BASE_VERSION}
+
+# Install the certs.
+COPY certs/                           /var/lib/istio/
+COPY certs/default/*                  /etc/certs/
+
+# Install the sidecar components
+COPY istio-sidecar.deb  /tmp/istio-sidecar.deb
+RUN dpkg -i /tmp/istio-sidecar.deb && rm /tmp/istio-sidecar.deb
+
+# Install the Echo application
+COPY echo-start.sh /usr/local/bin/echo-start.sh
+COPY client /usr/local/bin/client
+COPY server /usr/local/bin/server
+
+ENTRYPOINT ["/usr/local/bin/echo-start.sh"]
